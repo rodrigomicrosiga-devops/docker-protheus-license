@@ -2,7 +2,7 @@ name: Docker Build & Push to Docker Hub
 
 on:
   push:
-    branches:
+    branches: 
       - develop
     paths-ignore:
       - 'README.md'
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-push:
-    name: Build and Push Image on Local Infrastructure
+    name: Build and Push Image on Local Infrastructure V2
     runs-on: self-hosted  # 🚀 O Runner Global da Organização vai assumir aqui!
 
     steps:
