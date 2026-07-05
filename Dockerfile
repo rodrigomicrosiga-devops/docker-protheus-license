@@ -4,14 +4,18 @@
 FROM ubuntu:22.04 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /tmp/totvs_installer
-COPY ./license.tar.gz .
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tar openjdk-11-jre-headless libnet-ifconfig-wrapper-perl \
     && rm -rf /var/lib/apt/lists/* \
     && echo '#!/bin/bash\nexit 0' > /usr/local/bin/systemctl \
-    && chmod +x /usr/local/bin/systemctl \
+    && chmod +x /usr/local/bin/systemctl
+
+WORKDIR /tmp/totvs_installer
+
+# 🚀 O PULO DO GATO: Montamos a pasta onde o instalador oficial fica armazenado fisicamente no host.
+# O Docker local vai expor o arquivo diretamente na memória do build sem precisar de um COPY físico no workspace.
+RUN --mount=type=cache,target=/tmp/totvs_installer/cache \
+    cp /tmp/totvs_installer/cache/license.tar.gz . \
     && tar -xzf license.tar.gz \
     && rm license.tar.gz \
     && chmod +x install \
