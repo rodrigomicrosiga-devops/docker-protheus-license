@@ -65,4 +65,3 @@ docker build -t rodrigomicrosiga/license-dev:3.7.1 .
 # 3. Validar a execução local do container em modo standalone
 docker run -d --name protheus_license_teste -p 5555:5555 rodrigomicrosiga/license-dev:3.7.1
 ```
-
