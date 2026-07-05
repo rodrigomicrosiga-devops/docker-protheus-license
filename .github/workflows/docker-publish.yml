@@ -39,6 +39,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: |
-            rodrigomicrosiga/license-dev:3.7.1
-            rodrigomicrosiga/license-dev:latest
+          tags: rodrigomicrosiga/license-dev:3.7.1  # 🎯 Alterado: Apenas a tag imutável ativa
