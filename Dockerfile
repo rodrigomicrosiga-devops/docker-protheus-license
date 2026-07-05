@@ -26,6 +26,7 @@ RUN tar -xzf license.tar.gz \
 FROM ubuntu:22.04 AS runner
 LABEL maintainer="Rodrigo dos Santos Brandão <rodrigomicrosiga>"
 LABEL version="3.7.1"
+LABEL description="TOTVS License Server Virtual 3.7.1"
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=pt_BR.UTF-8 \
