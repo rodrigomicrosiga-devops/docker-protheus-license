@@ -12,11 +12,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /tmp/totvs_installer
 
-# 🚀 O PULO DO GATO: Montamos a pasta onde o instalador oficial fica armazenado fisicamente no host.
-# O Docker local vai expor o arquivo diretamente na memória do build sem precisar de um COPY físico no workspace.
-RUN --mount=type=cache,target=/tmp/totvs_installer/cache \
-    cp /tmp/totvs_installer/cache/license.tar.gz . \
-    && tar -xzf license.tar.gz \
+# O Docker vai buscar o arquivo de forma relativa no contexto que passarmos para ele
+COPY ./license.tar.gz .
+
+RUN tar -xzf license.tar.gz \
     && rm license.tar.gz \
     && chmod +x install \
     && ./install 2

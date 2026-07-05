@@ -17,6 +17,13 @@ jobs:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
+      # 🚀 SOLUÇÃO DEFINITIVA: Vincula o instalador guardado no seu host físico 
+      # para dentro do workspace temporário do runner ANTES do build começar.
+      # Usamos uma variável de ambiente do próprio runner para manter a portabilidade!
+      - name: Resgatar Instalador Local no Workspace
+        run: |
+          cp ../../license.tar.gz . 2>/dev/null || cp "${{ github.workspace }}/../license.tar.gz" . 2>/dev/null || cp /media/rodrigo/dados/docker-protheus-license/license.tar.gz .
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
