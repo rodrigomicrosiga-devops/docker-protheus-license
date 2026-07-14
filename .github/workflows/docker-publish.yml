@@ -19,10 +19,10 @@ jobs:
 
       # 🚀 SOLUÇÃO DEFINITIVA: Vincula o instalador guardado no seu host físico 
       # para dentro do workspace temporário do runner ANTES do build começar.
-      # Usamos uma variável de ambiente do próprio runner para manter a portabilidade!
+      # Usamos curingas de extensão para aceitar qualquer nome de instalador (.tar.gz / .TAR.GZ)
       - name: Resgatar Instalador Local no Workspace
         run: |
-          cp ../../license.tar.gz . 2>/dev/null || cp "${{ github.workspace }}/../license.tar.gz" . 2>/dev/null || cp /media/rodrigo/dados/docker-protheus-license/license.tar.gz .
+          cp ../../*.[tT][aA][rR].[gG][zZ] . 2>/dev/null || cp "${{ github.workspace }}/../"*.[tT][aA][rR].[gG][zZ] . 2>/dev/null || cp /media/rodrigo/dados/docker-protheus-license/*.[tT][aA][rR].[gG][zZ] .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
