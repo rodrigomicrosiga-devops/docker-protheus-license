@@ -2,7 +2,8 @@ name: Docker Build & Push to Docker Hub
 
 on:
   push:
-    branches: 
+    branches:
+      - main
       - develop
     paths-ignore:
       - 'README.md'
@@ -40,3 +41,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: rodrigomicrosiga/license-dev:3.7.1  # 🎯 Alterado: Apenas a tag imutável ativa
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}

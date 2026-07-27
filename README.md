@@ -51,6 +51,14 @@ Configurado com as diretivas `cache-from: type=gha` e `cache-to: type=gha,mode=m
 
 O build é processado de forma isolada (`ubuntu-latest`). Assim que o `push` para o `Docker Hub` é concluído, o GitHub destrói completamente o ambiente do runner, garantindo que nenhum resíduo ou binário proprietário fique exposto em servidores de terceiros.
 
+### 🏷️ Rastreabilidade de Build
+
+Como a tag da imagem publicada permanece fixa (`3.7.1`) entre builds — só muda quando a `TOTVS` libera uma nova versão do binário —, cada push do `pipeline` grava o label `org.opencontainers.image.revision` com o SHA do commit que originou aquele build específico. Isso permite identificar exatamente qual commit gerou a imagem em produção sem depender da tag:
+
+```bash
+docker inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' rodrigomicrosiga/license-dev:3.7.1
+```
+
 ### 🚀 Como Utilizar Localmente (Build Manual)
 
 Caso precise homologar alterações ou validar o comportamento do contêiner antes de enviar o código para a esteira remota, execute os comandos abaixo na raiz deste repositório:
