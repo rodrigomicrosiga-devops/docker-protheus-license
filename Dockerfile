@@ -68,4 +68,10 @@ COPY ./entrypoint.sh /totvs/totvslicensevirtual/entrypoint.sh
 RUN chmod +x /totvs/totvslicensevirtual/entrypoint.sh
 
 WORKDIR /totvs/totvslicensevirtual
+
+# netcat-openbsd já instalado -- checa se o license server está de fato
+# escutando na porta principal.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD nc -z localhost 5555 || exit 1
+
 ENTRYPOINT ["./entrypoint.sh"]
