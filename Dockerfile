@@ -19,6 +19,10 @@ WORKDIR /tmp/totvs_installer
 # Copia dinamicamente qualquer arquivo tar.gz/TAR.GZ
 COPY ./*.[tT][aA][rR].[gG][zZ] ./license.tar.gz
 
+# A partir desta versão do instalador a TOTVS parou de embutir o installer.properties
+# (respostas do instalador silencioso) dentro do pacote, então ele passa a ser versionado aqui.
+COPY ./installer.properties ./installer.properties
+
 RUN tar -xzf license.tar.gz \
     && rm license.tar.gz \
     && chmod +x install \
