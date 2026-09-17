@@ -53,10 +53,10 @@ O build é processado de forma isolada (`ubuntu-latest`). Assim que o `push` par
 
 ### 🏷️ Rastreabilidade de Build
 
-Como a tag da imagem publicada permanece fixa (`3.7.1`) entre builds — só muda quando a `TOTVS` libera uma nova versão do binário —, cada push do `pipeline` grava o label `org.opencontainers.image.revision` com o SHA do commit que originou aquele build específico. Isso permite identificar exatamente qual commit gerou a imagem em produção sem depender da tag:
+Como a tag da imagem publicada permanece fixa (`3.7.2`) entre builds — só muda quando a `TOTVS` libera uma nova versão do binário —, cada push do `pipeline` grava o label `org.opencontainers.image.revision` com o SHA do commit que originou aquele build específico. Isso permite identificar exatamente qual commit gerou a imagem em produção sem depender da tag:
 
 ```bash
-docker inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' rodrigomicrosiga/license-dev:3.7.1
+docker inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' rodrigomicrosiga/license-dev:3.7.2
 ```
 
 ### 🚀 Como Utilizar Localmente (Build Manual)
@@ -68,8 +68,8 @@ Caso precise homologar alterações ou validar o comportamento do contêiner ant
 # Nome esperado: license.tar.gz
 
 # 2. Execute o build local atribuindo a tag correspondente
-docker build -t rodrigomicrosiga/license-dev:3.7.1 .
+docker build -t rodrigomicrosiga/license-dev:3.7.2 .
 
 # 3. Validar a execução local do container em modo standalone
-docker run -d --name protheus_license_teste -p 5555:5555 rodrigomicrosiga/license-dev:3.7.1
+docker run -d --name protheus_license_teste -p 5555:5555 rodrigomicrosiga/license-dev:3.7.2
 ```

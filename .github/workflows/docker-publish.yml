@@ -40,6 +40,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: rodrigomicrosiga/license-dev:3.7.1  # 🎯 Alterado: Apenas a tag imutável ativa
+          tags: rodrigomicrosiga/license-dev:3.7.2  # 🎯 Alterado: Apenas a tag imutável ativa
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}

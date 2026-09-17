@@ -42,8 +42,8 @@ RUN strip --strip-unneeded /totvs/totvslicensevirtual/bin/appserver/broker_agent
 # ==============================================================================
 FROM debian:bookworm-slim AS runner
 LABEL maintainer="Rodrigo dos Santos Brandão <rodrigomicrosiga>"
-LABEL version="3.7.1"
-LABEL description="TOTVS License Server Virtual 3.7.1 - Ultra Light"
+LABEL version="3.7.2"
+LABEL description="TOTVS License Server Virtual 3.7.2 - Ultra Light"
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=pt_BR.UTF-8 \
