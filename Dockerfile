@@ -45,9 +45,12 @@ RUN strip --strip-unneeded /totvs/totvslicensevirtual/bin/appserver/broker_agent
 # ESTÁGIO 2: Runner
 # ==============================================================================
 FROM debian:bookworm-slim AS runner
+# Versão do componente: vem do construtor (build-arg), sem valor padrão para não rotular a imagem errada.
+ARG LICENSE_VERSION
+RUN test -n "${LICENSE_VERSION}" || { echo "ERRO: passe --build-arg LICENSE_VERSION=<versão>" >&2; exit 1; }
 LABEL maintainer="Rodrigo dos Santos Brandão <rodrigomicrosiga>"
-LABEL version="3.7.2"
-LABEL description="TOTVS License Server Virtual 3.7.2 - Ultra Light"
+LABEL version="${LICENSE_VERSION}"
+LABEL description="TOTVS License Server Virtual ${LICENSE_VERSION} - Ultra Light"
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=pt_BR.UTF-8 \
