@@ -2,54 +2,20 @@
 
 Este repositório é um componente isolado da arquitetura **TOTVS Protheus Modern DevOps** [https://github.com/rodrigomicrosiga-devops/totvs-protheus-modern-devops]. Seu papel exclusivo é atuar como uma fábrica de imagens imutáveis, compilando o binário do License Server Virtual e publicando-o diretamente no Docker Hub via CI/CD.
 
-## 🏗️ Fluxo de Arquitetura & Distribuição
+## 🏭 Build e publicação
 
-```mermaid
-graph TD
-    A[Dev: Atualiza Dockerfile/Scripts] -->|Git Push| B(GitHub Repository)
-    B -->|Trigger: Push on main/develop| C{GitHub Actions}
-    C -->|Autenticação Segura| D[Docker Hub Secrets]
-    C -->|Build Engine| E[Docker Buildx + Cache GHA]
-    E -->|Multi-Stage Build| F[Compilação da Imagem Limpa]
-    F -->|Push Automatizado| G[Docker Hub Registry]
-    G -->|Consumo Eficiente| H[Orquestrador Central local]
-```
+Esta imagem é construída pelo workflow central **`Build image`** do repositório privado `protheus-catalog` — este repositório não tem workflow de publicação, e um push aqui **não** publica nada.
 
-### 🔑 Segurança e Governança de Variáveis (GitHub Secrets)
+1. O catálogo guarda, por release, um manifesto (`releases/<release>/manifest.yaml`) com o caminho, o tamanho e o sha256 de cada arquivo oficial da TOTVS que compõe a imagem.
+2. `scripts/stage-image.sh <release> <imagem> <dir>` copia esses arquivos para um contexto limpo, **conferindo tamanho e sha256 antes e depois da cópia**; qualquer divergência aborta o build.
+3. O workflow acrescenta o `Dockerfile` e o `entrypoint.sh` deste repositório e roda `docker build --build-arg LICENSE_VERSION=<versão do manifesto>`. Só publica com `push=true` e **recusa uma tag que já exista** no Docker Hub.
 
-Para garantir conformidade com as melhores práticas de segurança de dados (`DevSecOps`), nenhuma credencial ou senha estática é armazenada no código-fonte. O `pipeline` consome variáveis injetadas dinamicamente em memória durante a execução através do `GitHub Repository Secrets`.
+* **Tag:** a versão do License Server (ex.: `3.7.2`).
+* **Build-arg:** `LICENSE_VERSION` (obrigatório, sem valor padrão).
+* Os pacotes oficiais da TOTVS não são versionados aqui (`.gitignore`).
 
-**Configuração das `Variáveis` no Painel do GitHub:**
+O `Dockerfile` usa **multi-stage**: o estágio *Builder* descompacta e executa o instalador oficial de forma silenciosa (`installer.properties`, versionado) e o *Runner* herda só os binários resultantes, sem o lixo do instalador.
 
-Para que a esteira funcione, o repositório foi configurado seguindo o caminho: `Settings -> Secrets and variables -> Actions -> New repository secret`.
-
-**`DOCKERHUB_USERNAME`**: Armazena o ID do proprietário do registro de contêineres.
-
-**`DOCKERHUB_TOKEN`**: Um token de acesso programático (`PAT`) gerado no painel do `Docker Hub` (`Account Settings -> Security -> New Access Token`). O uso do Token em vez da senha real mitiga riscos de sequestro de credenciais (`Credential Stuffing`) e permite revogação imediata sem impacto.
-
-### ⚙️ Funcionamento Interno do `Engine` de `Build` e `Cache`
-
-O `pipeline` utiliza recursos avançados de orquestração de imagens para acelerar o tempo de entrega e garantir o isolamento:
-
-1.**Compilação `Multi-Stage` (Dockerfile Otimizado)**
-
-O processo de build é dividido em duas etapas para garantir uma imagem final enxuta e livre de vulnerabilidades apontadas por ferramentas de análise estática (como o SonarQube):
-
-  * **Estágio 1 (Builder)**: Instala ferramentas de descompactação (`tar`), prepara o ambiente de runtime Java e executa o instalador oficial de forma silenciosa. Todo o lixo residual de compilação e arquivos .tar.gz morrem neste estágio.
-
-  * **Estágio 2 (Runner)**: Uma imagem Ubuntu limpa que herda estritamente os binários processados pelo `Builder`. Consolida instruções `RUN` para diminuir as camadas físicas (`layers`) no disco e garantir um tamanho reduzido para transferência na rede.
-
-2.**Gerenciamento Adaptativo de Cache (`type=gha`)**
-
-Configurado com as diretivas `cache-from: type=gha` e `cache-to: type=gha,mode=max`.
-
-  * O `Docker Buildx` exporta as camadas imutáveis do sistema operacional diretamente para a memória de armazenamento do `GitHub Actions`.
-
-  * Em builds subsequentes, se não houver alteração nos pacotes do sistema, o Docker ignora o download e o processamento do `apt-get`, executando o pipeline em segundos.
-
-3.**Ciclo de Vida do Runner Efêmero**
-
-O build é processado de forma isolada (`ubuntu-latest`). Assim que o `push` para o `Docker Hub` é concluído, o GitHub destrói completamente o ambiente do runner, garantindo que nenhum resíduo ou binário proprietário fique exposto em servidores de terceiros.
 
 ### 🏷️ Rastreabilidade de Build
 
@@ -64,11 +30,10 @@ docker inspect --format '{{ index .Config.Labels "org.opencontainers.image.revis
 Caso precise homologar alterações ou validar o comportamento do contêiner antes de enviar o código para a esteira remota, execute os comandos abaixo na raiz deste repositório:
 
 ```bash
-# 1. Garanta que o instalador oficial está presente na raiz (bloqueado pelo .gitignore)
-# Nome esperado: license.tar.gz
+# 1. Garanta que o instalador oficial (*.tar.gz da TOTVS) está na raiz (bloqueado pelo .gitignore)
 
 # 2. Execute o build local atribuindo a tag correspondente
-docker build -t rodrigomicrosiga/license-dev:3.7.2 .
+docker build --build-arg LICENSE_VERSION=3.7.2 -t rodrigomicrosiga/license-dev:3.7.2 .
 
 # 3. Validar a execução local do container em modo standalone
 docker run -d --name protheus_license_teste -p 5555:5555 rodrigomicrosiga/license-dev:3.7.2
